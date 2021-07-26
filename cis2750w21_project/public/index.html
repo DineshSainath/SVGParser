@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>DS Gpx Parser</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CHANGE ME">
+    <meta name="keywords" content="CHANGE ME">
+    <meta name="author" content="CHANGE ME">
+    <!-- Load jquery, bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.22/datatables.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"></script>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jquery-editable/css/jquery-editable.css"
+      rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/poshytip/1.2/jquery.poshytip.min.js"
+      integrity="sha512-/WRL6m0vrZwChpCDXLzRVpFqM5FqmF0k5A7NWQ+HvhtUtREs8MemDuFcMfEHZqg53UJmWbrs9aAWl6cDwdDv6w=="
+      crossorigin="anonymous"></script>
+  
+  
+    <script
+      src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jquery-editable/js/jquery-editable-poshytip.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.22/datatables.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <!-- Custom CSS End -->
+</head>
+<body>
+    <h3>GPX PARSER</h3> <br>  
+      <div class="alert alert-success" role="alert">Please clear the database and store all files when updating/renaming/adding the route/files.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+      <br><br>
+
+                                    <!-- File Log Panel begins-->
+      <div class="container-panels"> 
+      <div id="File-log-Panel"> 
+          <div class="container">
+            <br> <h3>File Log Panel</h3> 
+            <table class="table table-bordered table-responsive" id="fileLog-table">
+              <thead>
+                <tr>
+                  <th>Filename (Click to download)</th>
+                  <th>Version</th>
+                  <th>Creator</th>
+                  <th>No. of Waypoints</th>
+                  <th>No. of Routes</th>
+                  <th>No. of Tracks</th>
+                </tr>
+              </thead>
+            </table>
+
+          <form ref='uploadForm'
+		id='uploadForm'
+      method='post'
+      encType="multipart/form-data">
+      <div class="form-group">
+      	<input type="file" name="uploadFile" accept=".gpx" class="btn btn-dark">
+      	<input type='submit' value='Upload' class="btn btn-dark">
+      </div>
+   </form>
+  
+  </br>
+  <div id="Gpx-View-Panel">
+      <h3>GPX View Panel</h3><br>
+      <p>Select a file to view:  
+          <div class="container">
+            <form>
+              <select name="gpx-files" class="custom-select" id="gpx-menu">
+                <option selected>Select</option>
+              </select>
+            </form>
+          </div>
+          </div> 
+      </p>
+              
+              <div class="container">
+                <p><table id="gpx-table"  class="table table-responsive table-bordered">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Name</th>
+                  <th>No. of Points</th>
+                  <th>Length</th>
+                  <th>Loop</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            </p>
+              </div>
+
+                <div class="container">
+                    <form class="form-inline" id='renameForm' >
+                      <select name="filesForRename" class="custom-select" id="filesForRename">
+                        <option selected>Select a file to rename</option>
+                      </select> 
+                     <br>
+                <div class="input-group mr-sm-2"> <br>
+                  <input type="text" name="newname" class="form-control" id="newname" placeholder="New name">
+                </div>
+                
+                <button type="submit" class="btn btn-dark mr-sm-2">Rename</button>
+                    </form>
+                  </div>
+  <br> <br>
+      <div id="gpx-create">
+      <h3>Create GPX file</h3>
+          <form  id="gpx-new">
+          <div class="form-group row">
+            <label class="control-label col-sm-3 col-form-label" for="filename">Filename:</label>
+            <div class="col-sm-4">
+            <input type="text" class="form-control" id="filename" placeholder="Enter filename" name="filename" required>
+              </div>
+              <div class="input-group-append"><div class="input-group-text">.gpx</div></div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-sm-3 col-form-label" for="Version">Version:</label>
+            <div class="col-sm-4">
+            <input name="version" id="version" type="number" readonly class="form-control" value="1.1"></div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-sm-3 col-form-label" for="Creator">Creator:</label>
+            <div class="col-sm-4">
+            <input type="text" class="form-control" id="Creator" placeholder="Enter creator" name="Creator" required></div>
+          </div>
+          
+          <div class="col-sm-3">
+          <button type="submit" class="btn btn-dark">Submit</button></div>
+        </form>
+        <br>
+      </div>
+  
+  <!--Additional Functionality-->
+  <br> <br>
+      <div id="Add-Route">
+      <h3>Add Route</h3>
+          <form id="route-form">
+              <div class="form-group row">
+              <label for="route-files" class="col-sm-3 col-form-label">Add route to:</label>
+              <div class="col-sm-4">
+                  <select name="route-files" class="custom-select" id="route-files">
+                    <option selected>Select a file</option>
+                  </select>
+                  </div>
+              </div>
+              <div class="form-group row">
+              <label for="route-name" class="col-sm-3 col-form-label">Route Name:</label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control" id="route-name" placeholder="Enter the route name">
+              </div>
+            </div>
+                <fieldset class="form-group">
+                            <h6>Route Waypoints</h6>
+                            <div class="form-group">
+                              <div class="row" id="newwaypoints">
+                                <div class="col-md-12">
+                                    <table cellpadding="2" cellspacing="2" border="0">
+                                        <tr>
+                                        <td rowspan="2"><input id="waypointsCount" type="text" name="number" value="0" style="width:30px;height:23px;" /></td>
+                                        <td><input type="button" value=" + " onclick="changeWPCount(+1);this.form.number.value++;" style="font-size:10px;margin:0;padding:0;width:20px;height:20px;" ></td>
+                                        </tr>
+                                        <tr>
+                                        <td><input type=button value=" - " onclick="changeWPCount(-1);this.form.number.value--;" style="font-size:10px;margin:0;padding:0;width:20px;height:20px;" ></td>
+                                        </tr>
+                                        </table>
+                                </div>
+                              </div>
+                            </div>
+                </fieldset>
+                <div class="form-group row">
+              <div class="col-sm-10">
+                <button type="submit" class="btn btn-dark">Add route</button></div>
+              </div>
+            </div>
+          </form>
+        </br>
+      </div>
+      <br/>
+    </br>
+  <div class="container" id="find-path">
+      <h3>Find path between: </h3>
+      <form id="path">
+        <div class="form-group row">
+              <div class="col-sm-4">
+                <input type="text" id="lat-start" class="form-control"  placeholder="Start latitude">
+              </div>
+              <div class="col-sm-4">
+                <input type="text" id="long-start" class="form-control"  placeholder="Start longitude">
+              </div>
+          </div>
+          <div class="form-group row">
+              <div class="col-sm-4">
+                <input type="text" id="lat-end" class="form-control"  placeholder="End latitude">
+              </div>
+              <div class="col-sm-4">
+                <input type="text"  id="long-end" class="form-control" placeholder="End longitude">
+              </div>
+        </div>
+        <div class="form-group row">
+                  <label for="accuracy" class="col-sm-3 col-form-label">Accuracy:</label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control" id="accuracy" placeholder="Desired Accuracy">
+              </div>
+        </div>
+        <div class="form-inline">
+              <div class="col-sm-4">
+                <button type="submit" class="btn btn-dark">Find path</button></div>
+              </div>
+            </form>
+            </div>
+      
+
+    <br> <br> <br> <br>
+    <div>
+      <h4>
+        Database Functionalities
+      </h4>
+      <button type='button' id='store-all-files' class="btn btn-dark">Store All Files</button>
+  
+      <button type='button' id='clear-all-data' class="btn btn-dark">Clear All Data</button>
+  
+      <button type='button' id='display-db-status' class="btn btn-dark">Display DB Status</button>
+      <hr>
+  
+      <div>
+        <ul class="nav nav-pills flex-column">
+          <li class="nav-item" class="active"><a data-toggle="tab" href="#tab1" class="btn" id='query1'>Display all routes.</a></li>
+          <li class="nav-item"><a data-toggle="tab" class="btn " href="#tab2" id='query2'>Display the routes from a specific file.</a></li>
+          <li class="nav-item"><a data-toggle="tab" class="btn " href="#tab3" id='query3'>Display all points of a specific route, ordered by point index.</a></li>
+          <li class="nav-item"><a data-toggle="tab" class="btn " href="#tab4"> Display all points from a specific file.</a></li>
+          <li class="nav-item"><a data-toggle="tab" class="btn " href="#tab5">Display the N shortest/longest routes from a specific file.</a></li>
+        </ul>
+  
+        <div class="tab-content">
+          <div id="tab1" class="tab-pane fade in active">
+            <table id="query1-table" class='table'>
+              <thead>
+                <tr>
+                  <th>Route ID</th>
+                  <th>Route Name</th>
+                  <th>Route Length</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div id="query1-msg"></div>
+          </div>
+          <div id="tab2" class="tab-pane fade">
+            <select name="gpx-file-names" class="custom-select" id="query2-input-file">
+              <option selected>Select</option>
+            </select>
+            <table id="query2-table" class='table'>
+              <thead>
+                <tr>
+                  <th>Route ID</th>
+                  <th>Route Name</th>
+                  <th>Route Length</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div id="query2-msg"></div>
+          </div>
+          <div id="tab3" class="tab-pane fade">
+            <select name="gpx-routes" class="custom-select" id="query3-input-route">
+              <option selected>Select</option>
+            </select>
+            <button class='btn btn-primary' id="query3-fetch">Fetch</button>
+            <table id="query3-table" class='table'>
+              <thead>
+                <tr>
+                  <th>Point Index</th>
+                  <th>Point ID</th>
+                  <th>Point Name</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div id="query3-msg"></div>
+          </div>
+          <div id="tab4" class="tab-pane fade">
+            <select name="gpx-file-names-points" class="custom-select" id="query4-input-file">
+              <option selected>Select</option>
+            </select>
+            <table id="query4-table" class='table'>
+              <thead>
+                <tr>
+                  <th>Point Index</th>
+                  <th>Point ID</th>
+                  <th>Point Name</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
+                  <th>Route Name</th>
+
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div id="query4-msg"></div>
+          </div>
+          <div id="tab5" class="tab-pane fade">
+            <label for="N">Specify N to fetch  N routes.</label>
+            <input type="text" id="N" name="N">
+            <select name="gpx-file-names-points" class="custom-select" id="query5-input-file">
+              <option selected>Select</option>
+            </select>
+            <select name="gpx-order" class="custom-select" id="query5-input-order">
+              <option selected value='asc'>Shortest</option>
+              <option value='desc'>Longest</option>
+            </select>
+            <button class='btn btn-primary' id="query5">Fetch</button>
+            <table id="query5-table" class='table'>
+              <thead>
+                <tr>
+                  <th>Route ID</th>
+                  <th>Route Name</th>
+                  <th>Route Length</th>
+                  <th>File Name</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div id="query5-msg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div id='store-all-files-log'></div>
+    <div id='db-status-log'></div>
+    <div id='clear-db-log'></div>
+
+    <!-- Leave me at the bottom of body -->
+    <script src="/index.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
